@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>تبديل العملات</title>
+<style>
+*{box-sizing:border-box}body{margin:0;padding:clamp(12px,3vw,32px);background:#edf5fc;color:#153f68;font-family:Arial,sans-serif}button,input,select{font:inherit}button{cursor:pointer}button,select,input{ -webkit-tap-highlight-color:transparent}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #147cdb;outline-offset:4px}.app{max-width:1100px;margin:auto;background:#f7fbff;border:1px solid #d0e3f3;border-radius:28px;padding:26px;box-shadow:0 16px 60px #17497312}header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}h1{font-size:clamp(26px,4vw,36px);margin:0}.reset{background:white;border:1px solid #d3e3ef;color:#174b7c;border-radius:13px;padding:11px 16px}.layout{display:grid;grid-template-columns:1fr 1.08fr;gap:22px}.question{padding:32px;border:1px solid #d5e6f5;background:#eaf5ff;border-radius:22px;display:flex;flex-direction:column;align-items:stretch}.eyebrow{font-size:14px;color:#42739d;font-weight:bold}.coins{height:126px;position:relative;width:220px;align-self:center;margin:17px 0 23px;direction:ltr}.coin{position:absolute;display:grid;place-items:center;width:89px;height:89px;border-radius:50%;font-size:43px;font-weight:bold;border:7px solid #fce3a1;background:#ffd374;box-shadow:0 7px 0 #e6ae4b;color:#946018;transform:rotate(-12deg);left:19px;top:12px}.coin.blue{background:#96caff;color:#2566a3;border-color:#c5e3ff;box-shadow:0 7px 0 #639ed9;left:104px;top:34px;transform:rotate(13deg)}h2{font-size:25px;margin:0 0 14px}#questionText{font-size:23px;line-height:1.65;margin:0 0 24px}.answers{display:grid;gap:12px}.answer{display:flex;align-items:center;gap:14px;text-align:right;background:#fff;border:2px solid #d6e4f0;border-radius:15px;padding:17px;color:#153f68;font-size:19px;transition:background .2s,border-color .2s}.answer:hover{border-color:#81b6e5;background:#f8fcff}.letter{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#ecf4fb;font-size:15px;flex:none}.answer.correct{border-color:#26a278;background:#edfaf4}.answer.wrong{border-color:#d28363;background:#fff5ee}.feedback{min-height:29px;margin:17px 0 0;font-size:17px;font-weight:bold;line-height:1.6}.converter{background:#fff;border:1px solid #e0eaf2;border-radius:22px;padding:30px}label{display:block;font-size:15px;font-weight:bold;margin-bottom:10px}.amount-wrap{position:relative;margin-bottom:22px}input{width:100%;height:76px;background:#f8fbfe;border:1px solid #cbddec;border-radius:14px;padding:12px 20px;font-size:34px;color:#173f67;text-align:right;direction:ltr}input[aria-invalid=true]{border-color:#b54732}.currencies{display:grid;grid-template-columns:1fr 40px 1fr;gap:10px;align-items:end}.select-wrap{position:relative}.select-wrap:after{content:'⌄';position:absolute;left:16px;top:12px;pointer-events:none;color:#5281a6;font-size:23px}select{appearance:none;width:100%;height:57px;padding:10px 14px 10px 36px;background:#f8fbfe;border:1px solid #cbddec;border-radius:13px;color:#153f68;font-size:18px;cursor:pointer}.swap{height:57px;border:0;background:transparent;color:#4386bb;font-size:27px;border-radius:12px}.convert{width:100%;margin-top:24px;background:#187fe2;color:#fff;border:0;border-radius:14px;padding:17px;font-size:21px;font-weight:bold;display:flex;align-items:center;justify-content:center;gap:13px;box-shadow:0 5px 0 #1268bb;transition:background .2s,transform .2s}.convert:hover{background:#106fce}.convert:active{transform:translateY(3px);box-shadow:0 2px 0 #1268bb}.convert svg{width:25px;height:25px}.result{min-height:143px;background:#eff8ff;border:1px solid #daedfc;border-radius:16px;margin-top:25px;padding:20px;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:9px}.result .caption{color:#557c9a;font-size:15px}.result strong{font-size:clamp(26px,3.4vw,37px);overflow-wrap:anywhere;color:#146ac0}.result p{margin:0;font-size:16px;line-height:1.6}.result.pop{animation:pop .3s ease-out}.error{color:#ad412d;font-size:14px;margin:8px 0 0}.error:empty{display:none}.note{text-align:center;color:#71899d;font-size:12px;margin:18px 0 0}@keyframes pop{from{opacity:.3;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}@media(max-width:720px){body{padding:10px}.app{padding:16px;border-radius:21px}.layout{grid-template-columns:1fr}.question,.converter{padding:22px}.coins{display:none}#questionText{font-size:21px;margin-top:16px}.question{order:0}.converter{order:1}.currencies{grid-template-columns:1fr 32px 1fr;gap:6px}}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head>
+<body><main class="app"><header><h1>تبديل العملات</h1><button class="reset" id="reset" type="button">↻ إعادة تعيين</button></header><div class="layout">
+<section class="question" aria-labelledby="questionText"><span class="eyebrow">نتحقق ونكتشف</span><div class="coins" aria-hidden="true"><span class="coin">₪</span><span class="coin blue">$</span></div><h2 id="questionText"></h2><div class="answers" id="answers" role="group" aria-label="اختيار الإجابة"></div><p class="feedback" id="feedback" role="status"></p></section>
+<section class="converter" aria-labelledby="converterTitle"><h2 id="converterTitle">محوّل العملات</h2><form id="converterForm" novalidate><label for="amount">كم تريدون أن تحوّلوا؟</label><div class="amount-wrap"><input id="amount" type="text" inputmode="decimal" value="100" autocomplete="off" aria-describedby="error" maxlength="20"><p class="error" id="error" role="alert"></p></div><div class="currencies"><div><label for="from">من عملة</label><div class="select-wrap"><select id="from"><option value="ILS">شيكل</option><option value="THB">بات</option><option value="USD" selected>دولار</option><option value="EUR">يورو</option></select></div></div><button class="swap" id="swap" type="button" aria-label="تبديل عملة المصدر وعملة الهدف">⇄</button><div><label for="to">إلى عملة</label><div class="select-wrap"><select id="to"><option value="ILS">شيكل</option><option value="THB">بات</option><option value="USD">دولار</option><option value="EUR">يورو</option></select></div></div></div><button class="convert" type="submit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16m-4-4 4 4-4 4M20 17H4m4-4-4 4 4 4"/></svg>حوّل</button></form><div class="result" id="result" role="status" aria-live="polite"><span class="caption">ستظهر النتيجة هنا</span><p>أدخلوا المبلغ واختاروا العملات المراد التحويل بينها.</p></div><p class="note">أسعار صرف ثابتة لغرض النشاط · النتائج مقرّبة إلى منزلتين عشريتين</p></section>
+</div></main><script>
+'use strict';
+// Change the sample question and its two answers here.
+const QUESTION={text:'لدى نورا 100 دولار. هل سيصبح لديها بعد التحويل أكثر من 300 شيكل؟',answers:['نعم، أكثر من 300 شيكل','لا، أقل من 300 شيكل'],correct:0};
+// Values of one currency unit in ILS. No live exchange rates or network requests.
+const RATES={ILS:1,USD:3.0420,EUR:3.5203,THB:0.0911};
+const NAMES={ILS:['شيكل','شيكل'],USD:['دولار','دولارات'],EUR:['يورو','يورو'],THB:['بات','بات']};
+const $=id=>document.getElementById(id);
+const fmt=new Intl.NumberFormat('he-IL',{maximumFractionDigits:2});
+function currencyName(value,code){return NAMES[code][Number.isInteger(value)&&value!==1?1:0]}
+function rounded(value){return Number(value.toFixed(2))}
+function phrase(value,code){return fmt.format(value)+' '+currencyName(value,code)}
+function clearResult(){$('result').innerHTML='<span class="caption">ستظهر النتيجة هنا</span><p>انقروا على "حوّل" لحساب المبلغ.</p>'}
+function convert(event){if(event)event.preventDefault();const raw=$('amount').value.trim();const valid=/^(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d{1,2})?$/.test(raw);const amount=Number(raw.replaceAll(',',''));if(!valid||!Number.isFinite(amount)||amount<0||amount>1000000000){$('error').textContent='يجب إدخال مبلغ بين 0 ومليار، مع رقمين على الأكثر بعد الفاصلة العشرية.';$('amount').setAttribute('aria-invalid','true');clearResult();$('amount').focus();return} $('error').textContent='';$('amount').removeAttribute('aria-invalid');const from=$('from').value,to=$('to').value,total=rounded(amount*RATES[from]/RATES[to]);const result=$('result');result.innerHTML='';const caption=document.createElement('span');caption.className='caption';caption.textContent='نتيجة التحويل';const big=document.createElement('strong');big.textContent=phrase(total,to);const summary=document.createElement('p');summary.textContent=phrase(amount,from)+' = '+phrase(total,to);result.append(caption,big,summary);result.classList.remove('pop');void result.offsetWidth;result.classList.add('pop')}
+$('questionText').textContent=QUESTION.text;
+QUESTION.answers.forEach((text,i)=>{const b=document.createElement('button');b.type='button';b.className='answer';b.setAttribute('aria-pressed','false');const letter=document.createElement('span');letter.className='letter';letter.textContent=['أ','ب'][i];letter.setAttribute('aria-hidden','true');const label=document.createElement('span');label.textContent=text;b.append(letter,label);b.addEventListener('click',()=>{document.querySelectorAll('.answer').forEach(button=>{button.classList.remove('correct','wrong');button.setAttribute('aria-pressed','false')});b.setAttribute('aria-pressed','true');b.classList.add(i===QUESTION.correct?'correct':'wrong');$('feedback').textContent=i===QUESTION.correct?'صحيح جدًا‎!':'ليس تمامًا. حاولوا مرة أخرى.';$('feedback').style.color=i===QUESTION.correct?'#19805e':'#a65335'});$('answers').append(b)});
+$('converterForm').addEventListener('submit',convert);
+for(const id of ['amount','from','to'])$(id).addEventListener('input',()=>{clearResult();$('error').textContent='';$('amount').removeAttribute('aria-invalid')});
+$('swap').addEventListener('click',()=>{const from=$('from').value;$('from').value=$('to').value;$('to').value=from;clearResult()});
+$('reset').addEventListener('click',()=>{$('converterForm').reset();$('error').textContent='';$('amount').removeAttribute('aria-invalid');clearResult();$('feedback').textContent='';document.querySelectorAll('.answer').forEach(b=>{b.classList.remove('correct','wrong');b.setAttribute('aria-pressed','false')})});
+</script></body></html>
+
+<style id="maven-unit-fit">
+@import url("../../../unit-assets/fonts/fonts.css");
+/* ═══ MAVEN UNIT FIT - func-algebric-01 screens 2-3 (deck 5-6), appended 21.10.26 ═══
+   The producer's page is untouched above this block; deleting this block gives the
+   original back byte for byte (producer-assets/applets/currency-converter.original.html).
+   - the sample question panel is hidden: the screen asks the deck's own question beside it
+   - the unit font, and nothing under the 18px floor
+   - the page never scrolls inside our window; the app fills it */
+html, body { height: 100%; overflow: hidden; }
+body { padding: 0; background: transparent; font-family: Calibri, Carlito, Arial, sans-serif; }
+.app { height: 100%; max-width: none; padding: 14px 18px; border-radius: 16px; box-shadow: none;
+  display: flex; flex-direction: column; }
+.layout { grid-template-columns: 1fr; flex: 1 1 auto; min-height: 0; }
+.question { display: none; }
+header { margin-bottom: 8px; }
+h1 { font-size: 30px; }
+.converter { padding: 14px 18px; }
+.converter h2 { font-size: 24px; margin-bottom: 10px; }
+label, .reset, select, .result .caption, .result p, .error, .note { font-size: 18px; }
+.amount-wrap { margin-bottom: 8px; }
+input { height: 54px; font-size: 30px; }
+select { height: 52px; }
+.convert { margin-top: 12px; padding: 11px; font-size: 22px; }
+.result { min-height: 0; margin-top: 12px; padding: 12px 16px; gap: 4px; }
+.result strong { font-size: 30px; }
+.note { margin-top: 6px; }
+</style>
+<script id="maven-unit-default">
+/* QA 02.11.26 (dslide 2): the converter opens on באט -> שקל, so the learner does
+   not have to change it (the question is about 70 بات). defaultSelected, so the
+   app's own איפוס (form.reset) comes back to بات too. Delete with the block above. */
+(function () {
+  var from = document.getElementById('from');
+  if (!from) return;
+  [].forEach.call(from.options, function (o) { o.defaultSelected = (o.value === 'THB'); });
+  from.value = 'THB';
+})();
+</script>

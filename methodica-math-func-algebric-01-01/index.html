@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-store">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الدالة بالتمثيل الجبري (الهدف 22.1)</title>
+<link rel="stylesheet" href="../unit-assets/fonts/fonts.css?v=2026102101">
+  <link rel="stylesheet" href="../unit-css/styles.css?v=2026102101">
+</head>
+<body data-subject-theme="math">
+<div id="stage">
+<div id="app">
+  
+  <!-- Report/issue flag - the APPROVED chrome, copied verbatim from
+       shared/720-core/chrome/chrome-snippets.html. Do not restyle, do not
+       rebuild. The old PNG pair is gone: its hover export was a stale
+       SCIENCE-mode render (#019DE5), which is what made hover look wrong in
+       a maths unit. The glyph is live SVG driven by currentColor. -->
+  <button class="flag-btn" id="flag-btn" type="button" aria-label="هل وجدتم مشكلة؟">
+        <span class="flag-btn-icon">
+          <span class="flag-btn-glyph" aria-hidden="true">
+            <svg class="flag-btn-glyph-pole" viewBox="0 0 0.794329 17.0005" preserveAspectRatio="none" fill="none">
+              <path
+                d="M0.397164 17C0.177722 17 0 16.8239 0 16.6065V0.393501C0 0.176082 0.177722 0 0.397164 0C0.616607 0 0.794329 0.176082 0.794329 0.393501V16.607C0.794329 16.8245 0.616607 17.0005 0.397164 17.0005V17Z"
+                fill="currentColor" />
+            </svg>
+            <svg class="flag-btn-glyph-banner" viewBox="0 0 12 9.31542" preserveAspectRatio="none" fill="none">
+              <path
+                d="M2.76227 9.31542C1.91972 9.31542 1.06958 9.15545 0.213483 8.71363C0.0823588 8.64599 0 8.51124 0 8.36469V0.950975C0 0.814619 0.0715221 0.687925 0.188558 0.615989C0.305594 0.54459 0.45189 0.537611 0.574886 0.598811C0.577053 0.599884 0.578679 0.600958 0.580846 0.602032C2.31309 1.49586 4.05563 1.046 5.90003 0.569821C7.80946 0.0770055 9.78336 -0.431915 11.7865 0.601495C11.9176 0.669136 12 0.803882 12 0.950438V8.36415C12 8.4946 11.9344 8.617 11.8255 8.69001C11.7166 8.76302 11.5774 8.77805 11.4555 8.72974C11.443 8.7249 11.4311 8.71954 11.4197 8.71363C9.68745 7.8198 7.94491 8.26967 6.10051 8.7453C5.00709 9.02714 3.89199 9.31489 2.76281 9.31489L2.76227 9.31542ZM0.793787 8.11935C2.45559 8.87307 4.13094 8.44038 5.90003 7.98407C7.62469 7.53903 9.40191 7.08057 11.2062 7.75806V1.19631C9.54441 0.442591 7.86906 0.875281 6.09997 1.33159C4.37531 1.77663 2.59755 2.23509 0.793787 1.5576V8.11935Z"
+                fill="currentColor" />
+            </svg>
+          </span>
+        </span>
+        <span class="flag-btn-label">هل وجدتم مشكلة؟</span>
+      </button>
+
+
+  <!-- SCREENS - רכיב 1 · הוק והקניה · שקופיות 3-37 -->
+
+  <!-- ══ S0 - deck slide 3 · SelectionScreen-ShortText → TwoOptionSelection
+       (library template). The slide draws White on the RIGHT, Turquoise on
+       the LEFT; .option-cards is direction:ltr, so the first child is leftmost.
+       First screen of the unit: no رجوع (nothing to go back to). ══ -->
+  <section class="screen" data-screen="0" id="s0">
+    <div class="select-content">
+      <div class="select-head">
+        <h1 class="select-title">أي شخصية تريدون أن ترافقكم؟</h1>
+      </div>
+      <div class="option-cards" role="radiogroup" aria-label="اختاروا شخصية">
+        <div class="option-card" role="radio" aria-checked="false" tabindex="0"
+             data-value="character-turquoise" aria-label="وحش مكسو بالفرو بلون فيروزي" onclick="selectOption(this)">
+          <div class="option-card-img"><video class="option-card-video" src="../unit-assets/video/character-turquoise-standing.mp4" poster="../unit-assets/img/character-turquoise.png" autoplay loop muted playsinline preload="auto" aria-label="وحش فروي بلون فيروزي يلوّح بعلامة النصر"></video></div>
+        </div>
+        <div class="option-card" role="radio" aria-checked="false" tabindex="0"
+             data-value="character-white" aria-label="وحش فروي رمادي-أبيض" onclick="selectOption(this)">
+          <div class="option-card-img"><video class="option-card-video" src="../unit-assets/video/character-white-standing.mp4" poster="../unit-assets/img/character-white.png" autoplay loop muted playsinline preload="auto" aria-label="وحش فروي رمادي وأبيض يرتدي نظارات"></video></div>
+        </div>
+      </div>
+    </div>
+    <button class="btn-continue" id="s0-continue" disabled onclick="advanceScreen()">اخترتُ</button>
+  </section>
+
+  <!-- ══ S1 - deck slide 4 · FullImageWithTextOverlay - A, built as
+       PhotoWithMouthBubbles: both monsters are painted INTO the photo, so the
+       bubbles live in the photo's layer (1279x638 px = the deck's own rect)
+       and their tails come from the speakers - Turquoise (right) complains,
+       White (left) answers. ══ -->
+  <section class="screen" data-screen="1" id="s1">
+    <div class="fio-stage">
+      <img class="fio-img fa-top" src="assets/img/thailand-hook.jpg" alt="تجلس شخصيتان في تايلاند وتشربان عصير مانجو مخفوقًا، وإحداهما تمسك فاتورة المطعم." data-no-zoom>
+      <div class="fa-layer" data-w="1672" data-h="834" data-fy="0" data-keep-in>
+        <div class="fa-s1-pill">تايلاند 2027</div>
+        <div class="speech-bubble fa-s1-b1" data-stage data-tail-at="0.17" data-aim="1056">هل أنت جاد؟!<br>المخفوق الواحد ثمنه 70 بات، وطلبت اثنين؟!</div>
+        <div class="speech-bubble fa-s1-b2" data-stage data-tail-at="0.83" data-aim="674">اشرب رشفة واهدأ.<br>البات هو العملة التايلاندية، وقيمته ليست كقيمة الشيكل.<br>هيا نفحص كم شيكلًا تساوي 70 بات...</div>
+      </div>
+    </div>
+    <button class="btn-continue" onclick="advanceScreen()">متابعة</button>
+    <button class="btn-back" onclick="goTo(0)">رجوع</button>
+  </section>
+
+  <!-- Screen 2 (deck 5) is generated by quiz-engine.js from questions.js -->
+
+  <!-- ══ S3 - deck slide 6 · "מסך חופשי - טקסט ויישומון המרת כספים". The
+       converter stays live on the left (the notes do not freeze it), the text
+       on the right; breaks as the deck's paragraphs. ══ -->
+  <section class="screen" data-screen="3" id="s3">
+    <div class="applet-embed fa-conv fa-s3-applet"><iframe src="assets/applets/currency-converter.html" title="تطبيق تحويل العملات" scrolling="no" loading="lazy"></iframe></div>
+    <div class="fa-col fa-s3-text">
+      <p class="fa-ask"><strong>لكن كيف عرفت الآلة الحاسبة ماذا تفعل بالعدد الذي أدخلناه؟</strong></p>
+      <p class="fa-gap">خلف الآلة الحاسبة تختبئ قاعدة حسابية: فهي تستقبل سعرًا بعملة معيّنة، وتُجري عليه عملية ثابتة، وتُعيد سعرًا بعملة أخرى.</p>
+      <p class="fa-gap"><strong>في الرياضيات، يمكن وصف علاقة كهذه بواسطة دالة.</strong></p>
+    </div>
+    <button class="btn-continue" onclick="advanceScreen()">متابعة</button>
+    <button class="btn-back" onclick="goTo(2)">رجوع</button>
+  </section>
+
+  <!-- ══ S4 - deck slides 7+8 · SingleChoiceQuestion (poll, no feedback) +
+       FlipCard-Image, ONE screen in two states. Options and cards in the deck's
+       right-to-left order (an RTL row: the FIRST child renders rightmost). The
+       instruction line and the cards appear once the poll is answered. ══ -->
+  <section class="screen" data-screen="4" id="s4">
+    <p class="fa-ask fa-s4-q"><strong>وماذا عنكم؟ كم مرة برأيكم تصادفون دوال في يوم عادي؟</strong></p>
+    <div class="scq-answers fa-poll" role="radiogroup" aria-label="إمكانيات الإجابة">
+      <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="a" onclick="faPoll(this)"
+           onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();faPoll(this);}"><span class="scq-radio"></span><span class="scq-opt-text">أبدًا تقريبًا</span></div>
+      <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="b" onclick="faPoll(this)"
+           onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();faPoll(this);}"><span class="scq-radio"></span><span class="scq-opt-text">أحيانًا</span></div>
+      <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="c" onclick="faPoll(this)"
+           onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();faPoll(this);}"><span class="scq-radio"></span><span class="scq-opt-text">طوال الوقت</span></div>
+    </div>
+    <div class="fa-s4-reveal" aria-live="polite">
+      <p class="fa-s4-lead"><strong>الدوال جزء لا يتجزأ من عالمنا! اقلبوا</strong> البطاقات واكتشفوا بعض الأمثلة:</p>
+      <div class="fa-cards" role="group" aria-label="بطاقات - اضغطوا لقلبها">
+        <button class="frc-card fa-frc" data-index="0" type="button" aria-expanded="false" aria-label="البطاقة 1 - التسوّق - اضغطوا لقلبها" onclick="faFlipCard(this)">
+          <span class="frc-card-inner">
+            <span class="frc-card-front"><img src="assets/img/card-snacks.jpg" alt="رف وجبات خفيفة في المتجر" data-no-zoom></span>
+            <span class="frc-card-back" aria-hidden="true"><span class="frc-card-back-content"><strong class="fa-frc-title">التسوّق</strong><span>عند شراء الوجبات الخفيفة، يتغيّر السعر بحسب عدد الوجبات الخفيفة التي اشتريناها.</span></span></span>
+          </span>
+        </button>
+        <button class="frc-card fa-frc" data-index="1" type="button" aria-expanded="false" aria-label="البطاقة 2 - كاميرا الهاتف - اضغطوا لقلبها" onclick="faFlipCard(this)">
+          <span class="frc-card-inner">
+            <span class="frc-card-front"><img src="assets/img/card-phone.jpg" alt="التصوير بالهاتف المحمول" data-no-zoom></span>
+            <span class="frc-card-back" aria-hidden="true"><span class="frc-card-back-content"><strong class="fa-frc-title">كاميرا الهاتف</strong><span>فتحنا كاميرا الهاتف، وقد التقطت كمية الضوء وضبطت الإضاءة كي تظهر الصورة بأفضل شكل ممكن!</span></span></span>
+          </span>
+        </button>
+        <button class="frc-card fa-frc" data-index="2" type="button" aria-expanded="false" aria-label="البطاقة 3 - المكيّف - اضغطوا للقلب" onclick="faFlipCard(this)">
+          <span class="frc-card-inner">
+            <span class="frc-card-front"><img src="assets/img/card-ac.jpg" alt="فتاة تضبط المكيّف بواسطة جهاز التحكم عن بُعد" data-no-zoom></span>
+            <span class="frc-card-back" aria-hidden="true"><span class="frc-card-back-content"><strong class="fa-frc-title">المكيّف</strong><span>ضبطنا درجة الحرارة بجهاز التحكم، فعدّل المكيّف عمله وفقًا لمعطيات درجة الحرارة في المحيط.</span></span></span>
+          </span>
+        </button>
+      </div>
+    </div>
+    <button class="btn-continue" id="s4-continue" disabled onclick="advanceScreen()">متابعة</button>
+    <button class="btn-back" onclick="goTo(3)">رجوع</button>
+  </section>
+
+  <!-- ══ S5 - deck slide 9 · HookClosing-02-TextCharacter →
+       TeachingColumn-CharacterLeft. The companion with its mango shake at the
+       bottom-left, the bubble to its right with the tail pointing back. ══ -->
+  <section class="screen" data-screen="5" id="s5">
+    <div class="fa-col fa-s5-text">
+      <p class="fa-ask"><strong>ماذا سنتعلّم اليوم؟</strong></p>
+      <p class="fa-gap">وراء أشياء كثيرة نفعلها في حياتنا اليومية تختبئ <strong>علاقة بين الأعداد</strong>.</p>
+      <p class="fa-gap"><strong>في هذه الوحدة سنتعلّم كيف نكتشف ما العلاقة بين الأعداد، وكيف نبني بأنفسنا دالة تصفها.</strong></p>
+    </div>
+    <div class="character-widget fa-row fa-s5-char">
+      <img data-char-pose="mango" src="" alt="الشخصية المرافقة مع مخفوق المانجو" data-no-zoom>
+      <div class="speech-bubble side-bubble">إذًا هل يمكن مخفوق آخر؟</div>
+    </div>
+    <button class="btn-continue" onclick="advanceScreen()">متابعة</button>
+    <button class="btn-back" onclick="goTo(4)">رجوع</button>
+  </section>
+
+  <!-- ══ S6 - deck slide 10 · SelectionScreen-LongText → LearnModeChoice.
+       Read on the RIGHT, watch on the LEFT (option-cards is ltr: the first
+       child is leftmost). Read → deck 15 (screen 8), watch → deck 11
+       (screen 7); the notes' slide numbers are one low (KICKOFF). The deck's
+       title has no question mark. ══ -->
+  <section class="screen" data-screen="6" id="s6">
+    <div class="select-content">
+      <div class="select-head">
+        <h1 class="select-title">كيف تريدون أن تتعلموا</h1>
+      </div>
+      <div class="option-cards" role="radiogroup" aria-label="اختاروا طريقة للتعلّم">
+        <div class="option-card fa-path-card" role="radio" aria-checked="false" tabindex="0" data-value="video" onclick="faSelectPath(this)">
+          <div class="option-card-img"><img data-char-pose="video" src="" alt="الشخصية المرافقة تشاهد الفيديو" data-no-zoom></div>
+          <div class="option-card-label"><strong>مشاهدة فيديو</strong><br>عن النصيحة السرية لطارق</div>
+        </div>
+        <div class="option-card fa-path-card" role="radio" aria-checked="false" tabindex="0" data-value="read" onclick="faSelectPath(this)">
+          <div class="option-card-img"><img data-char-pose="story" src="" alt="الشخصية المرافقة تقرأ" data-no-zoom></div>
+          <div class="option-card-label"><strong>القراءة</strong><br>عن النصيحة السرية لطارق</div>
+        </div>
+      </div>
+    </div>
+    <button class="btn-continue" id="s6-continue" disabled onclick="goTo(window.faPath === 'video' ? 7 : 8)">اخترتُ</button>
+    <button class="btn-back" onclick="goTo(5)">رجوع</button>
+  </section>
+
+  <!-- ══ S7 - deck slide 11 · VideoWatchAndContinue → VideoWatch-ModeSwitch.
+       QA 02.11.26: the producer's video (ZPumVNA0Y1c) replaces the placeholder;
+       embed lifted from the approved proportion-03 S6. ══ -->
+  <section class="screen" data-screen="7" id="s7">
+    <h1 class="ts-title p3-title-top">كيف نبني الدوال بأنفسنا؟</h1>
+    <p class="ts-lead fa-s7-lead">شاهدوا الفيديو:</p>
+    <div class="video-frame p3-video-frame">
+      <iframe src="https://www.youtube-nocookie.com/embed/ZPumVNA0Y1c?rel=0&amp;modestbranding=1&amp;hl=he"
+        title="كيف نبني الدوال بأنفسنا؟" loading="lazy" allowfullscreen
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerpolicy="strict-origin-when-cross-origin"></iframe>
+    </div>
+    <button class="btn-continue" onclick="goTo(11)">متابعة</button>
+    <div class="mode-switch" role="group" aria-label="اختيار طريقة التعلّم">
+      <button class="mode-seg" type="button" aria-pressed="false" onclick="faGoPath('read')">
+        <span class="mode-seg-label">قراءة</span>
+        <svg class="mode-icon mode-icon-read" viewBox="0 0 19.5 25.3776" aria-hidden="true">
+          <path d="M3.13776 0.75H16.3622C17.6809 0.75 18.75 1.81903 18.75 3.13775V24.6275H0.75V3.13775C0.75 1.81903 1.81903 0.75 3.13776 0.75Z" stroke="currentColor" stroke-width="1.5" fill="none"></path>
+          <path d="M14.5258 4.97452H4.97479V6.44391H14.5258V4.97452Z" stroke="currentColor" fill="none"></path>
+          <path d="M14.5258 10.1175H4.97479V11.5869H14.5258V10.1175Z" stroke="currentColor" fill="none"></path>
+          <path d="M14.5256 15.2602H8.64807V16.7296H14.5256V15.2602Z" stroke="currentColor" fill="none"></path>
+        </svg>
+      </button>
+      <button class="mode-seg is-active" type="button" aria-pressed="true">
+        <span class="mode-seg-label">مشاهدة الفيديو</span>
+        <svg class="mode-icon mode-icon-watch" viewBox="0 0 21.3311 21.3314" aria-hidden="true">
+          <path d="M10.6654 21.3311C7.81657 21.3311 5.13834 20.2217 3.12369 18.2071C1.10936 16.1928 0 13.5142 0 10.6654C0 7.81657 1.10936 5.13834 3.12369 3.12401C5.13834 1.10936 7.81657 0 10.6654 0C13.5142 0 16.1924 1.10936 18.2071 3.12401C20.2214 5.13834 21.3311 7.81689 21.3311 10.6657C21.3311 13.5145 20.2217 16.1928 18.2071 18.2074C16.1928 20.2217 13.5142 21.3314 10.6654 21.3314V21.3311Z" fill="currentColor"></path>
+          <path class="mode-icon-play" d="M6.40469 16.4193C5.88206 16.4193 5.457 15.9942 5.457 15.4716V5.63209C5.457 5.10946 5.88206 4.6844 6.40469 4.6844C6.57019 4.6844 6.72899 4.72744 6.87631 4.81258L15.3976 9.7325C15.6938 9.90342 15.8708 10.2099 15.8708 10.552C15.8708 10.8942 15.6938 11.2006 15.3976 11.3715L6.87631 16.2914C6.72899 16.3766 6.57019 16.4196 6.40469 16.4193Z"></path>
+        </svg>
+      </button>
+    </div>
+    <button class="btn-back" onclick="goTo(6)">رجوع</button>
+  </section>
+
+  <!-- ══ S8 - deck slide 15 · FullImageWithTextOverlay - A (reading path):
+       Tomer with the envelope. No متابعة - the envelope is the button (notes).
+       Layer = the photo's own 1672x941 px; the cut-out is the deck's envelope
+       mock, lifted into the photo's pixels. ══ -->
+  <section class="screen" data-screen="8" id="s8">
+    <div class="fio-stage">
+      <img class="fio-img" src="assets/img/tomer-envelope.jpg" alt="نادل شاب في مطعم إيطالي يحمل مغلّف نقود." data-no-zoom>
+      <div class="fa-layer" data-w="1672" data-h="941">
+        <div class="speech-bubble side-bubble side-bubble--right fa-tomer-bubble">منذ شهر وأنا أعمل في العطلة الصيفية في مطعم إيطالي، ولم أعد أستطيع رؤية الباستا...<br>لكنني على الأقل جنيت مالًا جيدًا!<br><strong>هل نفتح المغلّف ونكتشف كم ربحت؟</strong></div>
+        <button class="fa-hot fa-tomer-hot" type="button" aria-label="افتحوا المغلّف" onclick="faHotspot(8)"><img src="assets/img/tomer-envelope-cut.png" alt="" data-no-zoom></button>
+      </div>
+    </div>
+    <div class="mode-switch" role="group" aria-label="اختيار طريقة التعلّم">
+      <button class="mode-seg is-active" type="button" aria-pressed="true">
+        <span class="mode-seg-label">قراءة</span>
+        <svg class="mode-icon mode-icon-read" viewBox="0 0 19.5 25.3776" aria-hidden="true">
+          <path d="M3.13776 0.75H16.3622C17.6809 0.75 18.75 1.81903 18.75 3.13775V24.6275H0.75V3.13775C0.75 1.81903 1.81903 0.75 3.13776 0.75Z" stroke="currentColor" stroke-width="1.5" fill="none"></path>
+          <path d="M14.5258 4.97452H4.97479V6.44391H14.5258V4.97452Z" stroke="currentColor" fill="none"></path>
+          <path d="M14.5258 10.1175H4.97479V11.5869H14.5258V10.1175Z" stroke="currentColor" fill="none"></path>
+          <path d="M14.5256 15.2602H8.64807V16.7296H14.5256V15.2602Z" stroke="currentColor" fill="none"></path>
+        </svg>
+      </button>
+      <button class="mode-seg" type="button" aria-pressed="false" onclick="faGoPath('video')">
+        <span class="mode-seg-label">مشاهدة الفيديو</span>
+        <svg class="mode-icon mode-icon-watch" viewBox="0 0 21.3311 21.3314" aria-hidden="true">
+          <path d="M10.6654 21.3311C7.81657 21.3311 5.13834 20.2217 3.12369 18.2071C1.10936 16.1928 0 13.5142 0 10.6654C0 7.81657 1.10936 5.13834 3.12369 3.12401C5.13834 1.10936 7.81657 0 10.6654 0C13.5142 0 16.1924 1.10936 18.2071 3.12401C20.2214 5.13834 21.3311 7.81689 21.3311 10.6657C21.3311 13.5145 20.2217 16.1928 18.2071 18.2074C16.1928 20.2217 13.5142 21.3314 10.6654 21.3314V21.3311Z" fill="currentColor"></path>
+          <path class="mode-icon-play" d="M6.40469 16.4193C5.88206 16.4193 5.457 15.9942 5.457 15.4716V5.63209C5.457 5.10946 5.88206 4.6844 6.40469 4.6844C6.57019 4.6844 6.72899 4.72744 6.87631 4.81258L15.3976 9.7325C15.6938 9.90342 15.8708 10.2099 15.8708 10.552C15.8708 10.8942 15.6938 11.2006 15.3976 11.3715L6.87631 16.2914C6.72899 16.3766 6.57019 16.4196 6.40469 16.4193Z"></path>
+        </svg>
+      </button>
+    </div>
+    <button class="btn-back" onclick="goTo(6)">رجوع</button>
+  </section>
+  <!-- ══ S9 - deck slide 16 · the locked tip box. Notes: hover glow on the
+       box; a click opens "התיבה נעולה..." and turns متابعة on. Layer = the
+       photo's 1776x886 px (cover - the deck squashes it 6.4%). Tomer is off
+       the picture: the bubble's tail points to the right edge, as drawn. ══ -->
+  <section class="screen" data-screen="9" id="s9">
+    <div class="fio-stage">
+      <img class="fio-img" src="assets/img/tip-box-locked.jpg" alt="طاولة عليها مغلّف مفتوح فيه نقود، وصندوق بقشيش مقفل." data-no-zoom>
+      <div class="fa-layer" data-w="1776" data-h="886">
+        <div class="speech-bubble side-bubble side-bubble--right fa-box-bubble"><strong>ربحت 1,750 ₪!</strong> وهذا ليس كل شيء.<br>يا ترى كم ينتظرني في صندوق البقشيش، <strong>افتحوه وسنكتشف.</strong></div>
+        <button class="fa-hot fa-box-hot" type="button" aria-label="افتحوا صندوق البقشيش" onclick="faHotspot(9)"><img src="assets/img/tip-box-cut.png" alt="" data-no-zoom></button>
+        <div class="fa-locked" id="s9-locked" role="status" hidden>
+          <p><strong>الصندوق مقفل.</strong></p>
+          <p>تابعوا وتعلّموا كيف نبني دالة أجر طارق، بما في ذلك البقشيش.</p>
+        </div>
+      </div>
+    </div>
+    <button class="btn-continue" id="s9-continue" disabled onclick="advanceScreen()">متابعة</button>
+    <div class="mode-switch" role="group" aria-label="اختيار طريقة التعلّم">
+      <button class="mode-seg is-active" type="button" aria-pressed="true">
+        <span class="mode-seg-label">قراءة</span>
+        <svg class="mode-icon mode-icon-read" viewBox="0 0 19.5 25.3776" aria-hidden="true">
+          <path d="M3.13776 0.75H16.3622C17.6809 0.75 18.75 1.81903 18.75 3.13775V24.6275H0.75V3.13775C0.75 1.81903 1.81903 0.75 3.13776 0.75Z" stroke="currentColor" stroke-width="1.5" fill="none"></path>
+          <path d="M14.5258 4.97452H4.97479V6.44391H14.5258V4.97452Z" stroke="currentColor" fill="none"></path>
+          <path d="M14.5258 10.1175H4.97479V11.5869H14.5258V10.1175Z" stroke="currentColor" fill="none"></path>
+          <path d="M14.5256 15.2602H8.64807V16.7296H14.5256V15.2602Z" stroke="currentColor" fill="none"></path>
+        </svg>
+      </button>
+      <button class="mode-seg" type="button" aria-pressed="false" onclick="faGoPath('video')">
+        <span class="mode-seg-label">مشاهدة الفيديو</span>
+        <svg class="mode-icon mode-icon-watch" viewBox="0 0 21.3311 21.3314" aria-hidden="true">
+          <path d="M10.6654 21.3311C7.81657 21.3311 5.13834 20.2217 3.12369 18.2071C1.10936 16.1928 0 13.5142 0 10.6654C0 7.81657 1.10936 5.13834 3.12369 3.12401C5.13834 1.10936 7.81657 0 10.6654 0C13.5142 0 16.1924 1.10936 18.2071 3.12401C20.2214 5.13834 21.3311 7.81689 21.3311 10.6657C21.3311 13.5145 20.2217 16.1928 18.2071 18.2074C16.1928 20.2217 13.5142 21.3314 10.6654 21.3314V21.3311Z" fill="currentColor"></path>
+          <path class="mode-icon-play" d="M6.40469 16.4193C5.88206 16.4193 5.457 15.9942 5.457 15.4716V5.63209C5.457 5.10946 5.88206 4.6844 6.40469 4.6844C6.57019 4.6844 6.72899 4.72744 6.87631 4.81258L15.3976 9.7325C15.6938 9.90342 15.8708 10.2099 15.8708 10.552C15.8708 10.8942 15.6938 11.2006 15.3976 11.3715L6.87631 16.2914C6.72899 16.3766 6.57019 16.4196 6.40469 16.4193Z"></path>
+        </svg>
+      </button>
+    </div>
+    <button class="btn-back" onclick="goTo(8)">رجوع</button>
+  </section>
+  <!-- ══ S10 - deck slides 17-22 · AccordionText (proportion-03 markup),
+       ONE screen in six states. The items sit in the right half as drawn; the
+       column scrolls (notes 22) with its bar on the right. The deck's yellow
+       highlight marks the datum each step adds (KICKOFF Q). ══ -->
+  <section class="screen" data-screen="10" id="s10">
+    <h1 class="ts-title p3-title-top">كيف نبني الدوال بأنفسنا؟</h1>
+    <p class="fa-acc-lead">لكتابة دالة انطلاقًا من قصة، علينا أن نفهم ما هي المعطيات التي لدينا وما العلاقة بينها.<br>اضغطوا على الخطوات:</p>
+    <div class="fa-acc-scroll">
+      <div class="fa-acc-inner">
+        <div class="acc-item" id="s10-acc-1">
+          <button class="acc-head" type="button" aria-expanded="false" onclick="faAccToggle(this)">
+            <svg class="acc-chevron" viewBox="0 0 16 8" fill="none" aria-hidden="true"><path d="M1 1L8 7L15 1" stroke="#303030" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="acc-head-text">1. سنحدد المتغير <span class="m" dir="ltr">𝑥</span></span>
+          </button>
+          <div class="acc-body">
+            <p>المبلغ الذي يتغير هو مبلغ البقشيش الذي حصل عليه طارق، ولذلك سنرمز إليه بالرمز <span class="m" dir="ltr">𝑥</span>.</p>
+            <p class="fa-data-h"><strong>المعطيات:</strong></p>
+            <p><mark class="fa-new">البقشيش - <span class="m" dir="ltr">𝑥</span></mark></p>
+          </div>
+        </div>
+        <div class="acc-item" id="s10-acc-2">
+          <button class="acc-head" type="button" aria-expanded="false" onclick="faAccToggle(this)">
+            <svg class="acc-chevron" viewBox="0 0 16 8" fill="none" aria-hidden="true"><path d="M1 1L8 7L15 1" stroke="#303030" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="acc-head-text">2. نحدّد ما تمثّله الدالة <span class="m" dir="ltr">𝑓(𝑥)</span></span>
+          </button>
+          <div class="acc-body">
+            <p>علينا أن نعرف ما سيكون الأجر الكلي لطارق مقابل كل مبلغ بقشيش سيحصل عليه.</p>
+            <p>نرمز إلى الأجر الكلي بـ <span class="m" dir="ltr">𝑓(𝑥)</span>.</p>
+            <p class="fa-data-h"><strong>المعطيات:</strong></p>
+            <p>البقشيش - <span class="m" dir="ltr">𝑥</span></p>
+            <p><mark class="fa-new">الأجر الكلي - <span class="m" dir="ltr">𝑓(𝑥)</span></mark></p>
+          </div>
+        </div>
+        <div class="acc-item" id="s10-acc-3">
+          <button class="acc-head" type="button" aria-expanded="false" onclick="faAccToggle(this)">
+            <svg class="acc-chevron" viewBox="0 0 16 8" fill="none" aria-hidden="true"><path d="M1 1L8 7L15 1" stroke="#303030" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="acc-head-text">3. نحدّد المعطيات المعروفة ونرمز إليها</span>
+          </button>
+          <div class="acc-body">
+            <p>المعطى الذي نعرفه بالفعل هو الأجر الأساسي لطارق: 1,750 ₪.</p>
+            <p class="fa-data-h"><strong>المعطيات:</strong></p>
+            <p>البقشيش - <span class="m" dir="ltr">𝑥</span></p>
+            <p>الأجر الكلي - <span class="m" dir="ltr">𝑓(𝑥)</span></p>
+            <p><mark class="fa-new">الأجر الأساسي - 1,750</mark></p>
+          </div>
+        </div>
+        <div class="acc-item" id="s10-acc-4">
+          <button class="acc-head" type="button" aria-expanded="false" onclick="faAccToggle(this)">
+            <svg class="acc-chevron" viewBox="0 0 16 8" fill="none" aria-hidden="true"><path d="M1 1L8 7L15 1" stroke="#303030" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="acc-head-text">4. سنتعرّف على العلاقة / النمط</span>
+          </button>
+          <div class="acc-body">
+            <p>الأجر الكلي لطارق يتكوّن من الأجر الأساسي ومبلغ البقشيش، لذلك نجمع بينهما.</p>
+            <p class="fa-data-h"><strong>المعطيات:</strong></p>
+            <p>البقشيش - <span class="m" dir="ltr">𝑥</span></p>
+            <p>الأجر الكلي - <span class="m" dir="ltr">𝑓(𝑥)</span></p>
+            <p>الأجر الأساسي - 1,750</p>
+            <div class="fa-wordeq" dir="ltr"><span class="fa-box">الأجر الكلي</span><span class="fa-op">=</span><span class="fa-box">الأجر الأساسي</span><span class="fa-op"><mark class="fa-new">+</mark></span><span class="fa-box">البقشيش</span></div>
+          </div>
+        </div>
+        <div class="acc-item" id="s10-acc-5">
+          <button class="acc-head" type="button" aria-expanded="false" onclick="faAccToggle(this)">
+            <svg class="acc-chevron" viewBox="0 0 16 8" fill="none" aria-hidden="true"><path d="M1 1L8 7L15 1" stroke="#303030" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="acc-head-text">5. نبني الدالة</span>
+          </button>
+          <div class="acc-body">
+            <p class="fa-formula"><span class="m" dir="ltr">𝑓(𝑥) = 1,750 + 𝑥</span></p>
+            <p>هي تصف العلاقة بين مبلغ البقشيش الذي يحصل عليه طارق (<span class="m" dir="ltr">𝑥</span>) وبين أجره الكلي <span class="m" dir="ltr">𝑓(𝑥)</span>.</p>
+            <p class="fa-data-h"><strong>المعطيات:</strong></p>
+            <p>البقشيش - <span class="m" dir="ltr">𝑥</span></p>
+            <p>الأجر الكلي - <span class="m" dir="ltr">𝑓(𝑥)</span></p>
+            <p>الأجر الأساسي - 1,750</p>
+            <div class="fa-wordeq fa-wordeq--build" dir="ltr">
+              <span class="fa-col-eq"><span class="fa-box">الأجر الكلي</span><span class="fa-arrow" aria-hidden="true">↓</span><mark class="fa-new fa-sym"><span class="m">𝑓(𝑥)</span></mark></span>
+              <span class="fa-col-eq"><span class="fa-op">=</span><span class="fa-arrow-gap"></span><mark class="fa-new fa-sym">=</mark></span>
+              <span class="fa-col-eq"><span class="fa-box">الأجر الأساسي</span><span class="fa-arrow" aria-hidden="true">↓</span><mark class="fa-new fa-sym">1,750</mark></span>
+              <span class="fa-col-eq"><span class="fa-op">+</span><span class="fa-arrow-gap"></span><mark class="fa-new fa-sym">+</mark></span>
+              <span class="fa-col-eq"><span class="fa-box">البقشيش</span><span class="fa-arrow" aria-hidden="true">↓</span><mark class="fa-new fa-sym"><span class="m">𝑥</span></mark></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="btn-continue" id="s10-continue" disabled onclick="goTo(12)">متابعة</button>
+    <div class="mode-switch" role="group" aria-label="اختيار طريقة التعلّم">
+      <button class="mode-seg is-active" type="button" aria-pressed="true">
+        <span class="mode-seg-label">قراءة</span>
+        <svg class="mode-icon mode-icon-read" viewBox="0 0 19.5 25.3776" aria-hidden="true">
+          <path d="M3.13776 0.75H16.3622C17.6809 0.75 18.75 1.81903 18.75 3.13775V24.6275H0.75V3.13775C0.75 1.81903 1.81903 0.75 3.13776 0.75Z" stroke="currentColor" stroke-width="1.5" fill="none"></path>
+          <path d="M14.5258 4.97452H4.97479V6.44391H14.5258V4.97452Z" stroke="currentColor" fill="none"></path>
+          <path d="M14.5258 10.1175H4.97479V11.5869H14.5258V10.1175Z" stroke="currentColor" fill="none"></path>
+          <path d="M14.5256 15.2602H8.64807V16.7296H14.5256V15.2602Z" stroke="currentColor" fill="none"></path>
+        </svg>
+      </button>
+      <button class="mode-seg" type="button" aria-pressed="false" onclick="faGoPath('video')">
+        <span class="mode-seg-label">مشاهدة الفيديو</span>
+        <svg class="mode-icon mode-icon-watch" viewBox="0 0 21.3311 21.3314" aria-hidden="true">
+          <path d="M10.6654 21.3311C7.81657 21.3311 5.13834 20.2217 3.12369 18.2071C1.10936 16.1928 0 13.5142 0 10.6654C0 7.81657 1.10936 5.13834 3.12369 3.12401C5.13834 1.10936 7.81657 0 10.6654 0C13.5142 0 16.1924 1.10936 18.2071 3.12401C20.2214 5.13834 21.3311 7.81689 21.3311 10.6657C21.3311 13.5145 20.2217 16.1928 18.2071 18.2074C16.1928 20.2217 13.5142 21.3314 10.6654 21.3314V21.3311Z" fill="currentColor"></path>
+          <path class="mode-icon-play" d="M6.40469 16.4193C5.88206 16.4193 5.457 15.9942 5.457 15.4716V5.63209C5.457 5.10946 5.88206 4.6844 6.40469 4.6844C6.57019 4.6844 6.72899 4.72744 6.87631 4.81258L15.3976 9.7325C15.6938 9.90342 15.8708 10.2099 15.8708 10.552C15.8708 10.8942 15.6938 11.2006 15.3976 11.3715L6.87631 16.2914C6.72899 16.3766 6.57019 16.4196 6.40469 16.4193Z"></path>
+        </svg>
+      </button>
+    </div>
+    <button class="btn-back" onclick="goTo(9)">رجوع</button>
+  </section>
+  <!-- ══ S11 - deck slide 14 · HookClosing-01-Text - the steps summary of the
+       video path. Notes: "השורות עולות בהדרגה. כפתור متابعة מעביר ליישומון
+       המסעדה בשקופית 23" (screen 12). Placed AFTER the reading
+       screens (Elad 21.10) so a 0..N walk sees both paths; the paths still route around each other. The table skin is the unit's one
+       table (Figma 716:24165). ══ -->
+  <section class="screen" data-screen="11" id="s11">
+    <h1 class="ts-title p3-title-top">للتلخيص - كيف نبني الدوال بأنفسنا؟</h1>
+    <p class="fa-sum-lead"><svg class="fa-pencil" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm17.71-10.21a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"/></svg>اقرؤوا ترتيب العمليات، <strong>انسخوه إلى الدفتر</strong> واحتفظوا به للتمارين القادمة:</p>
+    <table class="car-table fa-steps">
+      <thead><tr><th class="fa-steps-n"><span class="sr-only">الخطوة</span></th><th>العملية</th><th>في مثالنا</th></tr></thead>
+      <tbody>
+        <tr class="p3-step-line"><td class="fa-steps-n"><span class="p3-step-num">1</span></td><td><strong>نحدّد المتغيّر <span class="m" dir="ltr">𝑥</span></strong></td><td>المتغير <span class="m" dir="ltr">𝑥</span> هو البقشيش</td></tr>
+        <tr class="p3-step-line"><td class="fa-steps-n"><span class="p3-step-num">2</span></td><td><strong>نحدّد ما تمثّله الدالة <span class="m" dir="ltr">𝑓(𝑥)</span></strong></td><td>الدالة <span class="m" dir="ltr">𝑓(𝑥)</span> هي الأجر الكلي (الأجر الأساسي + البقشيش)</td></tr>
+        <tr class="p3-step-line"><td class="fa-steps-n"><span class="p3-step-num">3</span></td><td><strong>نحدّد المعطيات المعروفة ونرمز إليها</strong></td><td>المعطى المعروف هو الأجر الأساسي 1,750 ₪</td></tr>
+        <tr class="p3-step-line"><td class="fa-steps-n"><span class="p3-step-num">4</span></td><td><strong>نحدّد القاعدة / العلاقة</strong><br>على سبيل المثال: الجمع، الطرح، الضرب، القسمة.</td><td>العلاقة بين الأجر والبقشيش هي جمع</td></tr>
+        <tr class="p3-step-line"><td class="fa-steps-n"><span class="p3-step-num">5</span></td><td><strong>نكتب الدالة</strong></td><td><span class="m" dir="ltr">𝑓(𝑥) = 1,750 + 𝑥</span></td></tr>
+      </tbody>
+    </table>
+    <button class="btn-continue" onclick="goTo(12)">متابعة</button>
+    <div class="mode-switch" role="group" aria-label="اختيار طريقة التعلّم">
+      <button class="mode-seg" type="button" aria-pressed="false" onclick="faGoPath('read')">
+        <span class="mode-seg-label">قراءة</span>
+        <svg class="mode-icon mode-icon-read" viewBox="0 0 19.5 25.3776" aria-hidden="true">
+          <path d="M3.13776 0.75H16.3622C17.6809 0.75 18.75 1.81903 18.75 3.13775V24.6275H0.75V3.13775C0.75 1.81903 1.81903 0.75 3.13776 0.75Z" stroke="currentColor" stroke-width="1.5" fill="none"></path>
+          <path d="M14.5258 4.97452H4.97479V6.44391H14.5258V4.97452Z" stroke="currentColor" fill="none"></path>
+          <path d="M14.5258 10.1175H4.97479V11.5869H14.5258V10.1175Z" stroke="currentColor" fill="none"></path>
+          <path d="M14.5256 15.2602H8.64807V16.7296H14.5256V15.2602Z" stroke="currentColor" fill="none"></path>
+        </svg>
+      </button>
+      <button class="mode-seg is-active" type="button" aria-pressed="true">
+        <span class="mode-seg-label">مشاهدة الفيديو</span>
+        <svg class="mode-icon mode-icon-watch" viewBox="0 0 21.3311 21.3314" aria-hidden="true">
+          <path d="M10.6654 21.3311C7.81657 21.3311 5.13834 20.2217 3.12369 18.2071C1.10936 16.1928 0 13.5142 0 10.6654C0 7.81657 1.10936 5.13834 3.12369 3.12401C5.13834 1.10936 7.81657 0 10.6654 0C13.5142 0 16.1924 1.10936 18.2071 3.12401C20.2214 5.13834 21.3311 7.81689 21.3311 10.6657C21.3311 13.5145 20.2217 16.1928 18.2071 18.2074C16.1928 20.2217 13.5142 21.3314 10.6654 21.3314V21.3311Z" fill="currentColor"></path>
+          <path class="mode-icon-play" d="M6.40469 16.4193C5.88206 16.4193 5.457 15.9942 5.457 15.4716V5.63209C5.457 5.10946 5.88206 4.6844 6.40469 4.6844C6.57019 4.6844 6.72899 4.72744 6.87631 4.81258L15.3976 9.7325C15.6938 9.90342 15.8708 10.2099 15.8708 10.552C15.8708 10.8942 15.6938 11.2006 15.3976 11.3715L6.87631 16.2914C6.72899 16.3766 6.57019 16.4196 6.40469 16.4193Z"></path>
+        </svg>
+      </button>
+    </div>
+    <button class="btn-back" onclick="goTo(7)">رجوع</button>
+  </section>
+
+  <!-- ══ S12 - deck slide 23 · the restaurant applet (both paths meet here).
+       AppletScreen-Bleed + the deck's title card over it, top-right. The
+       applet is built from the notes' brief (no producer file - KICKOFF Q1).
+       رجوع returns along the path the learner took. ══ -->
+  <section class="screen" data-screen="12" id="s12">
+    <div class="applet-embed applet-bleed">
+      <iframe src="assets/applets/restaurant-tips.html" title="تطبيق المطعم - الأجر الكلي والبقشيش" scrolling="no" loading="lazy"></iframe>
+    </div>
+    <div class="fa-titlecard fa-s12-card">
+      <p><strong>نجحنا في بناء الدالة وانفتح الصندوق!</strong></p>
+      <p>غيّروا مبلغ البقشيش (<span class="m" dir="ltr">𝑥</span>) وتابعوا التغيّر في الأجر الكلي <span class="m" dir="ltr">𝑓(𝑥)</span>:</p>
+    </div>
+    <button class="btn-continue" onclick="advanceScreen()">متابعة</button>
+    <button class="btn-back" onclick="faBackFromApplet()">رجوع</button>
+  </section>
+
+  <!-- ══ S13 - deck slide 24 · GuidedMathPracticeSectionIntroScreen →
+       PracticeSetIntro-Character: the title runs on into the lead (one
+       sentence, as the deck splits it), the companion on its trip. ══ -->
+  <section class="screen" data-screen="13" id="s13">
+    <div class="transition-content ts-content p3-top">
+      <h1 class="ts-title">سنبدأ التمرين بعد قليل،</h1>
+      <p class="ts-lead">لكن قبل ذلك، تعالوا نحلّ تمرينًا واحدًا معًا</p>
+    </div>
+    <div class="fa-s13-char">
+      <img data-char-pose="tripIntro" src="" alt="الشخصية المرافقة بقبعة رحلات وحقيبة ظهر" data-no-zoom>
+    </div>
+    <button class="btn-continue" onclick="advanceScreen()">متابعة</button>
+    <button class="btn-back" onclick="goTo(12)">رجوع</button>
+  </section>
+
+  <!-- Screens 14-25 (deck 25-36) - the two guided flows - are generated by
+       buildGuidedScreens() in unit.js -->
+
+  <!-- ══ S26 - deck slide 37 · FullImageWithTextOverlay - A: the class on the
+       trail, the card top-right in the deck's panel purple. The deck's smiley is
+       a Wingdings glyph - a real ☺ here. End of component 01. ══ -->
+  <section class="screen" data-screen="26" id="s26">
+    <div class="fio-stage">
+      <img class="fio-img fa-s26-img" src="assets/img/ein-gedi-hikers-sunhats.jpg" alt="مجموعة من الطلاب يعتمرون قبعات الشمس يسيرون على مسار في محمية عين جدي الطبيعية، بجانب لوحة الأسعار." data-no-zoom>
+      <div class="fio-card fa-s26-card">
+        <p class="fa-s26-h"><strong>أحسنتم!</strong></p>
+        <p class="fa-s26-sub">نتمنى لكم رحلة تعلّم ناجحة ☺</p>
+      </div>
+    </div>
+    <button class="btn-continue" onclick="advanceScreen()">متابعة</button>
+    <button class="btn-back" onclick="goTo(25)">رجوع</button>
+  </section>
+
+  <!-- Quiz hint overlay - shared, outside all .screen divs -->
+  <div id="quiz-hint-overlay" class="hidden m-popup" role="dialog" aria-modal="true" aria-label="تلميح">
+    <div class="hint-popup">
+      <!-- 07.09: the bulb the hint card was missing. Plain-bulb variant
+           (viewBox 0 0 20.997 27.9988), the one the approved build uses in
+           the card title - deliberately NOT the button's rayed bulb. The
+           text lives in its own span so quizOpenHint() can rewrite it
+           without deleting the icon. -->
+      <h3 class="hint-title"><svg class="hint-title-icon" viewBox="0 0 40 35" fill="none" aria-hidden="true"><path d="M27.3745 4.25047C25.1822 2.12063 22.3177 1.05696 19.3069 1.25356C13.97 1.6014 9.65119 6.02493 9.25901 11.5398C9.01056 15.0358 10.3137 18.3755 12.8373 20.6995C14.2014 21.9572 14.9857 23.7921 14.9857 25.733H17.2754H22.7293H25.019C25.019 23.8224 25.8351 21.9547 27.26 20.6087C29.4937 18.5016 30.7726 15.4996 30.7726 12.3741C30.7726 9.24868 29.5327 6.34503 27.3721 4.24543L27.3745 4.25047ZM20.0012 8.53033C17.955 8.53033 16.2865 10.2544 16.2865 12.3767C16.2865 13.0295 15.7725 13.5613 15.1416 13.5613C14.5107 13.5613 13.9968 13.0295 13.9968 12.3767C13.9968 8.94874 16.6908 6.16104 20.0012 6.16104C20.6369 6.16104 21.1509 6.69287 21.1509 7.34569C21.1509 7.9985 20.6369 8.53033 20.0012 8.53033Z" fill="white"/><path d="M14.9829 30.1913C14.9829 31.2751 15.3824 32.2934 16.1205 33.0622L16.1448 33.0874C16.8902 33.8612 17.884 34.2896 18.9412 34.2896H21.0604C22.12 34.2896 23.1163 33.8637 23.8641 33.0848C24.6094 32.3136 25.0211 31.2852 25.0211 30.1963V27.6758H14.9829V30.1913ZM17.2726 30.0451H22.7265V30.1963C22.7265 30.6525 22.556 31.0886 22.2418 31.4137C21.93 31.7313 21.5013 31.9204 21.0604 31.9204H18.9412C18.5052 31.9204 18.0911 31.7439 17.7793 31.4314L17.7622 31.4112C17.4504 31.0936 17.2726 30.65 17.2726 30.1938V30.0476V30.0451Z" fill="white"/><path d="M38.8568 11.1914H34.7816C34.1482 11.1914 33.6367 11.7232 33.6367 12.3761C33.6367 13.0289 34.1507 13.5607 34.7816 13.5607H38.8568C39.4901 13.5607 40.0016 13.0289 40.0016 12.3761C40.0016 11.7232 39.4877 11.1914 38.8568 11.1914Z" fill="white"/><path d="M6.36734 12.3761C6.36734 11.7207 5.85338 11.1914 5.22249 11.1914H1.14486C0.511531 11.1914 0 11.7232 0 12.3761C0 13.0289 0.513967 13.5607 1.14486 13.5607H5.22005C5.85338 13.5607 6.36491 13.0289 6.36491 12.3761H6.36734Z" fill="white"/><path d="M32.1095 4.79094C32.3361 4.79094 32.565 4.72036 32.7648 4.57669L36.1043 2.15699C36.6232 1.78143 36.7474 1.04291 36.3845 0.506038C36.0215 -0.0308348 35.3078 -0.161902 34.789 0.216177L31.4494 2.63589C30.9306 3.01145 30.8063 3.74996 31.1693 4.28683C31.3909 4.61702 31.7466 4.79346 32.1095 4.79346V4.79094Z" fill="white"/><path d="M7.23672 20.1824L3.89716 22.6021C3.37832 22.9777 3.25409 23.7162 3.61703 24.2531C3.8387 24.5833 4.19433 24.7597 4.55727 24.7597C4.78381 24.7597 5.01278 24.6891 5.21252 24.5454L8.55209 22.1257C9.07093 21.7502 9.19516 21.0117 8.83221 20.4748C8.46927 19.9379 7.75556 19.8068 7.23672 20.1849V20.1824Z" fill="white"/><path d="M36.1042 22.5989L32.7646 20.1792C32.2457 19.8037 31.532 19.9347 31.1691 20.4691C30.8062 21.006 30.9328 21.7445 31.4492 22.12L34.7888 24.5397C34.9885 24.6859 35.2175 24.754 35.444 24.754C35.8045 24.754 36.1602 24.5776 36.3843 24.2474C36.7472 23.7105 36.6206 22.972 36.1042 22.5964V22.5989Z" fill="white"/><path d="M8.5524 2.63409L5.21283 0.214385C4.69399 -0.161174 3.98028 -0.0301066 3.61734 0.504246C3.2544 1.04112 3.38106 1.77963 3.89746 2.15519L7.23703 4.5749C7.43677 4.72109 7.66574 4.78915 7.89228 4.78915C8.25279 4.78915 8.60842 4.61271 8.83252 4.28252C9.19546 3.74565 9.0688 3.00713 8.5524 2.63157V2.63409Z" fill="white"/></svg><span class="hint-title-text"></span></h3>
+      <p class="hint-body"></p>
+      <button class="hint-close-btn" data-label="العودة إلى السؤال" onclick="quizCloseHint()">العودة إلى السؤال</button>
+    </div>
+  </div>
+
+  <!-- Problem-report modal (approved-units pattern; posts to the shared Google Form) -->
+  <div id="report-modal" class="report-modal-overlay m-popup" hidden role="dialog" aria-modal="true" aria-labelledby="report-modal-title">
+    <div class="report-modal-box">
+      <button class="report-close-btn" onclick="tryCloseReportModal()" aria-label="إغلاق">&#10005;</button>
+      <h2 class="report-modal-title" id="report-modal-title">التبليغ عن مشكلة</h2>
+      <p class="report-modal-body">هل هناك شيء غير واضح أو لا يعمل كما ينبغي؟ أخبرونا بما حدث حتى نتمكن من المعالجة.</p>
+      <div class="report-field">
+        <label class="report-label" for="report-type">ما نوع المشكلة <span class="required-star">*</span></label>
+        <select class="report-select" id="report-type">
+          <option value="" disabled selected>اختاروا نوع المشكلة</option>
+          <option value="technical">عطل تقني أو شيء ما لا يعمل</option>
+          <option value="unclear">هناك شيء لا أفهمه</option>
+          <option value="other">آخر</option>
+        </select>
+      </div>
+      <div class="report-field">
+        <label class="report-label" for="report-text">ماذا حدث؟ <span class="required-star">*</span></label>
+        <textarea class="report-textarea" id="report-text" maxlength="250" rows="4" placeholder="صِفوا المشكلة..."></textarea>
+        <span class="report-char-count" id="report-char-count">0 / 250</span>
+      </div>
+      <p class="report-error" id="report-error" hidden>يرجى اختيار نوع المشكلة ووصف ما حدث.</p>
+      <div class="report-actions">
+        <button class="report-submit-btn" onclick="submitReport()">إرسال</button>
+        <button class="report-cancel-btn" onclick="tryCloseReportModal()">إلغاء</button>
+      </div>
+      <div class="report-thanks" id="report-thanks" hidden>
+        <p>شكرًا! تم إرسال البلاغ. سنتعامل معه في أقرب وقت.</p>
+        <button class="report-submit-btn" onclick="forceCloseReportModal()">إغلاق</button>
+      </div>
+    </div>
+  </div>
+  <div id="report-confirm-modal" class="report-modal-overlay m-popup" hidden role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
+    <div class="report-modal-box report-confirm-box">
+      <h2 class="report-modal-title" id="confirm-modal-title">هل تريدون إغلاق النافذة فعلًا؟</h2>
+      <p class="report-modal-body">إذا ضغطتم على إغلاق لن يتم إرسال التبليغ</p>
+      <div class="report-actions">
+        <button class="report-cancel-btn" onclick="forceCloseReportModal()">إغلاق النافذة</button>
+        <button class="report-submit-btn" onclick="backToReportForm()">أريد التبليغ</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+  
+  <script src="script.js"></script>
+  <script src="../unit-js/motion.js?v=2026102101"></script>
+  <script src="../unit-js/quiz-engine.js?v=2026102101"></script>
+  <script src="../unit-js/questions.js?v=2026102101"></script>
+  <script src="../unit-js/unit.js?v=2026102101"></script>
+  <script src="../unit-js/report-modal.js?v=2026102101"></script>
+  <script src="../unit-js/engine.js?v=2026102101"></script>
+</body>
+</html>

@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تطبيق المطعم - البقشيش</title>
+<link rel="stylesheet" href="../../../unit-assets/fonts/fonts.css">
+<style>
+  /* Restaurant tips applet (deck slide 23, unit screen 12).
+     The whole scene lives in the PHOTO's own pixel space (1774 x 887) and is
+     scaled like object-fit:cover, so the live bills always sit inside the
+     painted tip box. At the 1280 x 634 stage the scale is 0.7215, so every
+     font here is set >= 25px (renders >= 18px at the stage size). */
+  :root {
+    --primary: #3B2FC2;
+    --primary-2: #5656CC;
+    --primary-3: #5749C4;
+    --tint-1: #E1D9FF;
+    --tint-2: #F1D9FF;
+    --text: #222222;
+    --font: Calibri, Carlito, Arial, sans-serif;
+    --math: 'Cambria Math', 'STIX Two Math', 'STIX Two Text', 'Times New Roman', serif;
+  }
+  html, body { height: 100%; margin: 0; overflow: hidden; }
+  body {
+    background: #4a2c17;
+    font-family: var(--font);
+    font-size: 25px;
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  #viewport { position: absolute; inset: 0; overflow: hidden; }
+  #scene, .ui-layer {
+    position: absolute; left: 0; top: 0;
+    width: 1774px; height: 887px;
+    transform-origin: 0 0;
+  }
+  .ui-layer { pointer-events: none; }
+  .ui-layer .slider-panel { pointer-events: auto; }
+  /* wide/tall windows: the photo may not fill the window; a blurred copy fills the rest */
+  .backdrop {
+    position: absolute; inset: -40px; width: calc(100% + 80px); height: calc(100% + 80px);
+    object-fit: cover; filter: blur(22px) brightness(.82); pointer-events: none;
+  }
+  #scene.fade-x .plate {
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 70px, #000 calc(100% - 70px), transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 70px, #000 calc(100% - 70px), transparent 100%);
+  }
+  #scene > .plate {
+    position: absolute; left: 0; top: 0; width: 1774px; height: 887px;
+    display: block; pointer-events: none;
+  }
+
+  /* envelope front (photo px x 260-880, y 510-720): the base pay, hand-lettered look */
+  .env-label {
+    position: absolute; left: 330px; top: 600px; width: 480px; text-align: center;
+    font-family: Calibri, Carlito, Arial, sans-serif; font-weight: 800; font-size: 76px; line-height: 1;
+    color: #2b3a67; opacity: .9; transform: rotate(-1deg); pointer-events: none;
+  }
+  /* ---------- tip box: bills + front panel overlay ---------- */
+  #bills { position: absolute; left: 0; top: 0; width: 1774px; height: 887px; pointer-events: none; }
+  .bill {
+    position: absolute; width: 270px; height: 94px;
+    filter: drop-shadow(0 3px 3px rgba(40, 20, 5, .45));
+    will-change: transform, opacity;
+  }
+  .bill svg { width: 100%; height: 100%; display: block; overflow: visible; direction: ltr; }
+  .box-front {
+    position: absolute; left: 925px; top: 600px; width: 507px; height: 212px;
+    pointer-events: none;
+  }
+
+  /* ---------- equation row (math reads left-to-right) ---------- */
+  .equation {
+    direction: ltr;
+    position: absolute; left: 0; top: 0; width: 1774px; height: 0;
+  }
+  .eq-box {
+    position: absolute; top: 160px; height: 156px;
+    box-sizing: border-box;
+    display: flex; flex-direction: column;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 10px 26px rgba(30, 14, 4, .38), 0 2px 6px rgba(30, 14, 4, .25);
+    overflow: hidden;
+    direction: rtl;
+  }
+  .eq-box .head {
+    height: 50px; flex: 0 0 50px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px; font-weight: 700; line-height: 1;
+    background: var(--tint-1); color: var(--primary);
+  }
+  .eq-box .val {
+    flex: 1 1 auto;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 66px; font-weight: 800; line-height: 1;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+  #box-f     { left: 242px;  width: 322px; }
+  #box-base  { left: 640px;  width: 300px; }
+  #box-tips  { left: 1022px; width: 318px; }
+  #box-total { left: 1416px; width: 310px; border: 4px solid var(--primary); }
+  #box-f .head { background: var(--primary); color: #fff; }
+  #box-tips .head { background: var(--tint-2); color: var(--primary-3); }
+  #box-total .head { background: var(--tint-1); }
+  #box-total .val { color: var(--primary); }
+  #box-total .shekel { font-size: 52px; font-weight: 800; }
+  .coins { width: 64px; height: 42px; display: block; }
+
+  .op {
+    position: absolute; top: 210px; width: 60px; height: 60px; margin-left: -30px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(30, 14, 4, .35);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 52px; font-weight: 800; line-height: 1; color: var(--primary);
+  }
+  .op span { transform: translateY(-3px); }
+  #op-eq1 { left: 602px; }
+  #op-plus { left: 981px; }
+  #op-eq2 { left: 1378px; }
+
+  .m { font-family: var(--math); font-weight: 400; font-style: normal; }
+  .val .m { font-weight: 400; }
+  .ltr { direction: ltr; unicode-bidi: isolate; display: inline-block; }
+
+  /* the two values that change with x get a short pulse */
+  .live {
+    display: inline-block; border-radius: 10px; padding: 0 5px; margin: 0 -3px;
+  }
+  .live.pulse { animation: pulse 520ms ease-out; }
+  @keyframes pulse {
+    0%   { background: transparent; transform: scale(1); }
+    30%  { background: var(--tint-1); transform: scale(1.1); }
+    100% { background: transparent; transform: scale(1); }
+  }
+
+  /* ---------- live sentence ---------- */
+  .live-line {
+    position: absolute; top: 328px; left: 300px; width: 600px;
+    display: flex; justify-content: center;
+    pointer-events: none;
+  }
+  .live-line p {
+    margin: 0; padding: 4px 22px 6px;
+    background: rgba(255, 255, 255, .94);
+    border-radius: 999px;
+    box-shadow: 0 6px 16px rgba(30, 14, 4, .3);
+    font-size: 30px; font-weight: 600; line-height: 1.25; color: var(--text);
+    white-space: nowrap;
+  }
+  .live-line .num { font-weight: 800; color: var(--primary); }
+
+  /* ---------- vertical slider ---------- */
+  .slider-panel {
+    position: absolute; left: 1462px; top: 346px; width: 186px; height: 456px;
+    box-sizing: border-box;
+    background: rgba(255, 255, 255, .92);
+    border-radius: 24px;
+    box-shadow: 0 10px 24px rgba(30, 14, 4, .35);
+    direction: ltr;
+  }
+  .slider {
+    position: absolute; left: 14px; top: 26px; width: 76px; height: 404px;
+    cursor: pointer; touch-action: none; outline: none;
+  }
+  .track {
+    position: absolute; left: 50%; top: 0; bottom: 0; width: 16px; margin-left: -8px;
+    border-radius: 8px; background: var(--tint-1);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, .18);
+  }
+  .fill {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    border-radius: 8px; background: var(--primary-2);
+  }
+  .knob {
+    position: absolute; left: 50%; width: 52px; height: 52px; margin: -26px 0 0 -26px;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 5px solid #fff; box-sizing: border-box;
+    box-shadow: 0 3px 10px rgba(30, 14, 4, .45);
+    transition: box-shadow .15s;
+  }
+  .slider.dragging { cursor: grabbing; }
+  .slider:focus-visible .knob { box-shadow: 0 0 0 6px rgba(87, 73, 196, .45), 0 3px 10px rgba(30, 14, 4, .45); }
+  .ticks { position: absolute; left: 70px; top: 26px; width: 110px; height: 404px; }
+  .tick {
+    position: absolute; left: 0; height: 36px; margin-top: -18px;
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 8px 0 0;
+    background: none; border: 0; cursor: pointer;
+    font-family: var(--font); font-size: 27px; font-weight: 600; line-height: 1;
+    color: #4a4a4a;
+    font-variant-numeric: tabular-nums;
+  }
+  .tick::before { content: ''; width: 14px; height: 3px; border-radius: 2px; background: #9a93c9; }
+  .tick:hover { color: var(--primary); }
+  .tick.on { color: var(--primary); font-weight: 800; font-size: 30px; }
+  .tick.on::before { background: var(--primary); width: 18px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .live.pulse { animation-duration: 1ms; }
+  }
+</style>
+</head>
+<body>
+<div id="viewport">
+  <img class="backdrop" src="restaurant-table.jpg" alt="" aria-hidden="true">
+  <div id="scene">
+    <img class="plate" src="restaurant-table.jpg" width="1774" height="887"
+         alt="طاولة في مطعم عليها مغلّف فيه نقود وصندوق بقشيش مفتوح. كل ورقة نقدية في الصندوق قيمتها 50 شيكلًا.">
+
+    <!-- QA 02.11.26 (dslide 12): the base pay written on the envelope, in photo px
+         so it rides the cover scaling with the picture -->
+    <div class="env-label" dir="rtl" aria-hidden="true">1,750 شيكل</div>
+    <div id="bills" aria-hidden="true"></div>
+    <img class="box-front" src="tip-box-front.png" alt="" aria-hidden="true">
+  </div>
+
+  <!-- UI layers: same photo-px design coords, but placed in WINDOW space by layout() -->
+  <div class="ui-layer" id="eq-layer">
+    <div class="equation" aria-hidden="true">
+      <div class="eq-box" id="box-f">
+        <div class="head"><span class="ltr m">𝑓(𝑥)</span>&nbsp;- الأجر الكلي</div>
+        <div class="val"><span class="ltr"><span class="m">𝑓</span>(<span class="live" id="f-arg">150</span>)</span></div>
+      </div>
+      <div class="op" id="op-eq1"><span>=</span></div>
+      <div class="eq-box" id="box-base">
+        <div class="head">الأجر الأساسي</div>
+        <div class="val"><span class="ltr" id="base-val">1,750</span></div>
+      </div>
+      <div class="op" id="op-plus"><span>+</span></div>
+      <div class="eq-box" id="box-tips">
+        <div class="head"><span class="ltr m">𝑥</span>&nbsp;- البقشيش</div>
+        <div class="val"><span class="ltr"><span class="live" id="tips-val">150</span></span></div>
+      </div>
+      <div class="op" id="op-eq2"><span>=</span></div>
+      <div class="eq-box" id="box-total">
+        <div class="head">
+          <svg class="coins" viewBox="0 0 64 42" aria-hidden="true">
+            <defs>
+              <linearGradient id="gold" x1="0" x2="1">
+                <stop offset="0" stop-color="#E9A800"/><stop offset=".5" stop-color="#FFD54A"/><stop offset="1" stop-color="#E0A000"/>
+              </linearGradient>
+            </defs>
+            <g stroke="#B57F00" stroke-width="1.5">
+              <ellipse cx="22" cy="34" rx="16" ry="5.5" fill="url(#gold)"/>
+              <rect x="6" y="28" width="32" height="6" fill="url(#gold)" stroke="none"/>
+              <ellipse cx="22" cy="28" rx="16" ry="5.5" fill="url(#gold)"/>
+              <rect x="6" y="22" width="32" height="6" fill="url(#gold)" stroke="none"/>
+              <ellipse cx="22" cy="22" rx="16" ry="5.5" fill="#FFD54A"/>
+              <ellipse cx="44" cy="34" rx="16" ry="5.5" fill="url(#gold)"/>
+              <rect x="28" y="16" width="32" height="18" fill="url(#gold)" stroke="none"/>
+              <line x1="28" y1="16" x2="28" y2="34"/><line x1="60" y1="16" x2="60" y2="34"/>
+              <ellipse cx="44" cy="22" rx="16" ry="5.5" fill="none" stroke-opacity=".5"/>
+              <ellipse cx="44" cy="28" rx="16" ry="5.5" fill="none" stroke-opacity=".5"/>
+              <ellipse cx="44" cy="16" rx="16" ry="5.5" fill="#FFD54A"/>
+            </g>
+          </svg>
+        </div>
+        <div class="val"><span class="total"><span id="total-val">1,900</span> <span class="shekel">₪</span></span></div>
+      </div>
+    </div>
+
+    <div class="live-line">
+      <p id="live-line" aria-live="polite"><span class="ltr" dir="ltr"><span class="m">𝑥</span> = <span class="num" id="line-x">150</span></span>، أي أن طارق حصل على <span class="num" id="line-tips">150</span> شيكلًا كبقشيش.</p>
+    </div>
+
+  </div>
+
+  <div class="ui-layer" id="slider-layer">
+    <div class="slider-panel">
+      <div class="slider" id="slider" role="slider" tabindex="0"
+           aria-label="مبلغ البقشيش x، بالشواكل"
+           aria-orientation="vertical"
+           aria-valuemin="0" aria-valuemax="500" aria-valuenow="150"
+           aria-valuetext="150 شيكل بقشيش، الأجر الكلي 1,900 شيكل">
+        <div class="track"><div class="fill" id="fill"></div></div>
+        <div class="knob" id="knob"></div>
+      </div>
+      <div class="ticks" id="ticks" aria-hidden="true"></div>
+    </div>
+  </div>
+</div>
+
+<!-- one 50 shekel note, drawn flat and squashed by the layout into perspective -->
+<template id="bill-tpl">
+  <svg viewBox="0 0 300 150" preserveAspectRatio="none" direction="ltr">
+    <defs>
+      <linearGradient id="billBg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#CFE6B8"/>
+        <stop offset=".55" stop-color="#93C77E"/>
+        <stop offset="1" stop-color="#C2DFAA"/>
+      </linearGradient>
+      <radialGradient id="billGlow" cx=".72" cy=".5" r=".35">
+        <stop offset="0" stop-color="#F2F9EA" stop-opacity=".95"/>
+        <stop offset="1" stop-color="#F2F9EA" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect x="0" y="0" width="300" height="150" rx="7" fill="url(#billBg)"/>
+    <rect x="7" y="7" width="286" height="136" rx="4" fill="none" stroke="#EEF7E4" stroke-width="3"/>
+    <rect x="0" y="0" width="300" height="150" rx="7" fill="url(#billGlow)"/>
+    <g fill="none" stroke="#4E8A3A" stroke-opacity=".45" stroke-width="1.6">
+      <ellipse cx="215" cy="75" rx="44" ry="50"/>
+      <ellipse cx="215" cy="75" rx="34" ry="40"/>
+      <ellipse cx="215" cy="75" rx="24" ry="29"/>
+      <path d="M20 118 C 70 98, 110 138, 160 112 S 250 100, 282 120"/>
+      <path d="M20 128 C 70 108, 110 148, 160 122 S 250 110, 282 130"/>
+    </g>
+    <path d="M200 103 c 0-16 7-26 15-26 s 15 10 15 26 z M215 74 a 10 12 0 1 1 0.1 0 z" fill="#3F7A2E" fill-opacity=".55"/>
+    <rect x="128" y="0" width="7" height="150" fill="#3F7A2E" fill-opacity=".55"/>
+    <text x="20" y="62" font-family="Calibri, Carlito, Arial, sans-serif" font-weight="800" font-size="58" fill="#1F5418">50</text>
+    <text x="97" y="58" font-family="Calibri, Carlito, Arial, sans-serif" font-weight="800" font-size="34" fill="#1F5418">₪</text>
+    <text x="278" y="138" text-anchor="end" font-family="Calibri, Carlito, Arial, sans-serif" font-weight="800" font-size="40" fill="#F4FAEE" stroke="#245C1B" stroke-width="1">50</text>
+  </svg>
+</template>
+
+<script>
+(() => {
+  'use strict';
+
+  // ---------- config (single source of truth) ----------
+  const CONFIG = {
+    min: 0,
+    max: 500,
+    step: 50,
+    baseSalary: 1750,
+    initialTips: 150,
+    billValue: 50,
+    photo: { width: 1774, height: 887 }
+  };
+
+  // bill poses inside the painted box, photo px: [left, top, rotate deg]
+  const BILL_POSES = [
+    [1012, 540, -4], [1098, 530, 6], [1040, 518, -8], [1090, 547, 3], [1006, 524, 7],
+    [1070, 512, -5], [1030, 549, 2], [1106, 520, -7], [1056, 535, 9], [1022, 507, -2]
+  ];
+
+  // ---------- state: one variable ----------
+  let x = CONFIG.initialTips;
+
+  // ---------- derived values ----------
+  const fOf = (tips) => CONFIG.baseSalary + tips;
+  const billsFor = (tips) => Math.round(tips / CONFIG.billValue);
+  const fmt = (n) => n.toLocaleString('en-US');
+  const clamp = (v) => Math.min(CONFIG.max, Math.max(CONFIG.min, v));
+  const snap = (v) => clamp(Math.round(v / CONFIG.step) * CONFIG.step);
+
+  // ---------- elements ----------
+  const $ = (id) => document.getElementById(id);
+  const scene = $('scene');
+  const slider = $('slider');
+  const knob = $('knob');
+  const fill = $('fill');
+  const ticksEl = $('ticks');
+  const billsEl = $('bills');
+  const billTpl = $('bill-tpl');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---------- layout ----------
+  // The host canvas is fluid (1280x634 up to ~2100x634, or taller). The host's title card
+  // covers the top 100px, so:
+  //  - UI (equation row, live line, slider) is placed in WINDOW px, sized by
+  //    u = min(W/1280, H/634); the equation row top is always 112px.
+  //  - the photo (+ tip box art + bills) keeps cover scaling where it can, but is capped
+  //    and anchored so the tip box sits fully below the equation row and left of the slider.
+  const LAYOUT = {
+    designW: 1280, designH: 634,
+    rowTop: 112,                 // window px, below the host title card
+    rowTopPhoto: 160,            // equation row top / bottom in photo px
+    rowBottomPhoto: 316,
+    boxTop: 338, boxBottom: 806, // painted tip box (lid top .. bottom), photo px
+    boxRight: 1450,
+    panel: { left: 1462, top: 346, width: 186, height: 456 },
+    gap: 10, edge: 10
+  };
+  const eqLayer = document.getElementById('eq-layer');
+  const sliderLayer = document.getElementById('slider-layer');
+
+  function layout() {
+    const W = window.innerWidth, H = window.innerHeight;
+    const P = CONFIG.photo, L = LAYOUT;
+    const u = Math.min(W / L.designW, H / L.designH);
+    const k = u * L.designW / P.width;                  // UI design px -> window px
+
+    // equation row + live line: a 1280u-wide band centred in the window, top at 112px
+    const eqTx = (W - L.designW * u) / 2;
+    const rowTop = L.rowTop * Math.min(1, u);          // a scaled-down host scales its title card too
+    const eqTy = rowTop - L.rowTopPhoto * k;
+    eqLayer.style.transform = `translate(${eqTx}px, ${eqTy}px) scale(${k})`;
+    const rowBottom = rowTop + (L.rowBottomPhoto - L.rowTopPhoto) * k;
+
+    // photo scale: cover, capped so the tip box fits between the row and the bottom edge
+    const lidMin = rowBottom + L.gap;
+    const sCover = Math.max(W / P.width, H / P.height);
+    const sFit = (H - L.edge - lidMin) / (L.boxBottom - L.boxTop);
+    const s = Math.min(sCover, sFit);
+    const pw = P.width * s, ph = P.height * s;
+    const panelW = L.panel.width * k, panelH = L.panel.height * k;
+
+    let ox = (W - pw) / 2;
+    if (pw >= W) ox = Math.min(0, Math.max(W - pw, ox));
+    ox = Math.min(ox, W - L.edge - panelW - L.gap - L.boxRight * s); // box stays left of the slider
+    let oy = (H - ph) / 2;
+    const oyLo = Math.max(ph >= H ? H - ph : -Infinity, lidMin - L.boxTop * s);
+    const oyHi = Math.min(ph >= H ? 0 : Infinity, H - L.edge - L.boxBottom * s);
+    oy = Math.min(Math.max(oy, oyLo), oyHi);
+    scene.style.transform = `translate(${ox}px, ${oy}px) scale(${s})`;
+    scene.classList.toggle('fade-x', pw < W - 1);
+
+    // slider: beside the box, never off the right edge, below the row, above the bottom
+    const left = Math.min(ox + L.panel.left * s, W - L.edge - panelW);
+    const top = Math.min(Math.max(oy + L.panel.top * s, rowBottom + L.gap), H - L.edge - panelH);
+    sliderLayer.style.transform = `translate(${left - L.panel.left * k}px, ${top - L.panel.top * k}px) scale(${k})`;
+  }
+
+  // ---------- slider geometry ----------
+  const ratioOf = (v) => (v - CONFIG.min) / (CONFIG.max - CONFIG.min);
+  const sliderHeight = () => slider.offsetHeight;
+
+  function buildTicks() {
+    for (let v = CONFIG.max; v >= CONFIG.min; v -= CONFIG.step) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'tick';
+      b.tabIndex = -1;
+      b.dataset.value = String(v);
+      b.textContent = String(v);
+      b.style.top = `${(1 - ratioOf(v)) * sliderHeight()}px`;
+      b.addEventListener('click', () => { setX(v); slider.focus({ preventScroll: true }); });
+      ticksEl.appendChild(b);
+    }
+  }
+
+  // ---------- bills ----------
+  function makeBill(i) {
+    const [left, top, rot] = BILL_POSES[i];
+    const el = document.createElement('div');
+    el.className = 'bill';
+    el.style.left = `${left}px`;
+    el.style.top = `${top}px`;
+    el.style.transform = `rotate(${rot}deg)`;
+    el.dataset.rot = String(rot);
+    el.appendChild(billTpl.content.firstElementChild.cloneNode(true));
+    return el;
+  }
+
+  function syncBills(count) {
+    const present = Array.from(billsEl.children).filter((el) => !el.dataset.leaving);
+    // add missing bills (in pose order, each on top of the last)
+    for (let i = present.length; i < count; i++) {
+      const el = makeBill(i);
+      billsEl.appendChild(el);
+      if (!reduceMotion) {
+        const rot = Number(el.dataset.rot);
+        el.animate([
+          { transform: `translate(0, -70px) rotate(${rot + 7}deg)`, opacity: 0 },
+          { transform: `rotate(${rot}deg)`, opacity: 1 }
+        ], { duration: 300, delay: (i - present.length) * 45, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'backwards' });
+      }
+    }
+    // remove extra bills (top of the pile first)
+    for (let i = present.length - 1; i >= count; i--) {
+      const el = present[i];
+      el.dataset.leaving = '1';
+      if (reduceMotion) { el.remove(); continue; }
+      const rot = Number(el.dataset.rot);
+      const anim = el.animate([
+        { transform: `rotate(${rot}deg)`, opacity: 1 },
+        { transform: `translate(0, -55px) rotate(${rot - 6}deg)`, opacity: 0 }
+      ], { duration: 220, easing: 'ease-in', fill: 'forwards' });
+      anim.onfinish = () => el.remove();
+    }
+  }
+
+  // ---------- render (everything derived from x) ----------
+  function pulse(el) {
+    el.classList.remove('pulse');
+    void el.offsetWidth;
+    el.classList.add('pulse');
+  }
+
+  function render(changed) {
+    const total = fOf(x);
+    $('f-arg').textContent = fmt(x);
+    $('tips-val').textContent = fmt(x);
+    $('base-val').textContent = fmt(CONFIG.baseSalary);
+    $('total-val').textContent = fmt(total);
+    $('line-x').textContent = fmt(x);
+    $('line-tips').textContent = fmt(x);
+
+    const y = (1 - ratioOf(x)) * sliderHeight();
+    knob.style.top = `${y}px`;
+    fill.style.height = `${ratioOf(x) * 100}%`;
+    slider.setAttribute('aria-valuenow', String(x));
+    slider.setAttribute('aria-valuetext', `${fmt(x)} شيكل بقشيش، الأجر الكلي ${fmt(total)} شيكل`);
+    ticksEl.querySelectorAll('.tick').forEach((t) => t.classList.toggle('on', Number(t.dataset.value) === x));
+
+    syncBills(billsFor(x));
+    if (changed) { pulse($('f-arg')); pulse($('tips-val')); }
+  }
+
+  function setX(v) {
+    const next = snap(v);
+    if (next === x) return;
+    x = next;
+    render(true);
+  }
+
+  // ---------- input: drag / click on the track ----------
+  function valueFromPointer(ev) {
+    const r = slider.getBoundingClientRect();
+    const t = (ev.clientY - r.top) / r.height;
+    return CONFIG.min + (1 - t) * (CONFIG.max - CONFIG.min);
+  }
+  slider.addEventListener('pointerdown', (ev) => {
+    ev.preventDefault();
+    slider.focus({ preventScroll: true });
+    slider.setPointerCapture(ev.pointerId);
+    slider.classList.add('dragging');
+    setX(valueFromPointer(ev));
+  });
+  slider.addEventListener('pointermove', (ev) => {
+    if (!slider.hasPointerCapture(ev.pointerId)) return;
+    setX(valueFromPointer(ev));
+  });
+  const endDrag = (ev) => {
+    if (slider.hasPointerCapture(ev.pointerId)) slider.releasePointerCapture(ev.pointerId);
+    slider.classList.remove('dragging');
+  };
+  slider.addEventListener('pointerup', endDrag);
+  slider.addEventListener('pointercancel', endDrag);
+
+  // ---------- input: keyboard ----------
+  slider.addEventListener('keydown', (ev) => {
+    const k = ev.key;
+    let next = null;
+    if (k === 'ArrowUp' || k === 'ArrowRight' || k === 'PageUp') next = x + CONFIG.step;
+    else if (k === 'ArrowDown' || k === 'ArrowLeft' || k === 'PageDown') next = x - CONFIG.step;
+    else if (k === 'Home') next = CONFIG.min;
+    else if (k === 'End') next = CONFIG.max;
+    if (next === null) return;
+    ev.preventDefault();
+    setX(next);
+  });
+
+  // ---------- boot ----------
+  layout();
+  window.addEventListener('resize', layout);
+  buildTicks();
+  render(false);
+  // The iframe can load while its screen is hidden (slider height 0): re-place ticks + knob once it has a size.
+  new ResizeObserver(() => {
+    ticksEl.querySelectorAll('.tick').forEach((t) => { t.style.top = `${(1 - ratioOf(Number(t.dataset.value))) * sliderHeight()}px`; });
+    knob.style.top = `${(1 - ratioOf(x)) * sliderHeight()}px`;
+  }).observe(slider);
+
+  // test hook (read-only)
+  window.restaurantApplet = { get x() { return x; }, setX, bills: () => billsEl.querySelectorAll('.bill:not([data-leaving])').length };
+})();
+</script>
+</body>
+</html>
